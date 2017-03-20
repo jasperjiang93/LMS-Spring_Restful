@@ -1,129 +1,357 @@
 package LMS.MVC;
 
 
-import LMS.DAO.LibraryDAO;
+import LMS.DAO.*;
 import LMS.Entity.*;
 import LMS.Service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Created by cj on 3/3/17.
  */
-@Controller
+@RestController
 @RequestMapping("/admin")
 public class AdminController {
 
     @Autowired
     AdminService adminService;
+    @Autowired
+    AuthorDAO adao;
+    @Autowired
+    BookDAO bdao;
+    @Autowired
+    GenreDAO genreDAO;
+    @Autowired
+    AuthorDAO authorDAO;
+    @Autowired
+    PublisherDAO publisherDAO;
+    @Autowired
+    Book_CopyDAO book_copyDAO;
+    @Autowired
+    Book_LoanDAO book_loanDAO;
+    @Autowired
+    BorrowerDAO borrowerDAO;
+    @Autowired
+    LibraryDAO libraryDAO;
+
+    @Autowired
+    BookDAO bookDAO;
+
 
     //author-----------------
-    @RequestMapping("/author")
-    public String author(Model model) throws SQLException, ClassNotFoundException {
-        model.addAttribute("adminService", adminService);
-        return "author";
+    @RequestMapping(value="/getAllAuthors", method = RequestMethod.GET, produces = "application/json")
+    public List<Author> getAllAuthors() throws SQLException, ClassNotFoundException {
+        List<Author>authors= authorDAO.readAllAuthors();
+        if (authors != null && !authors.isEmpty()) {
+            for (Author a : authors) {
+                a.setBooks(bdao.readByAuthor(a.getAuthorId()));
+            }
+        }
+        return authors;
     }
+
+    @RequestMapping(value="/getAllBooks", method = RequestMethod.GET, produces = "application/json")
+    public List<Book> getAllBooks() throws SQLException, ClassNotFoundException {
+        List<Book>books= bookDAO.readAllBooks();
+        List<Genre> genres;
+        List<Author> authors;
+        Publisher publisher;
+        for(Book a:books)
+        {
+            genres=genreDAO.getGenresByBookId(a.getBookId());
+            authors=authorDAO.getAuthorsByBookId(a.getBookId());
+            publisher=publisherDAO.readPublisherByPk(a.getPubId());
+            a.setGenres(genres);
+            a.setAuthors(authors);
+            a.setPublisher(publisher);
+        }
+     return books;
+    }
+
+    @RequestMapping(value = "/addAuthor", method=RequestMethod.POST, consumes = "application/json")
+    public void addAuthor(@RequestBody Author author) throws SQLException, ClassNotFoundException {
+        int authorId=adao.addAuthorkWithID(author.getAuthorName());
+        for(Integer a:author.getBookIds())
+            adao.addAuthorBook(authorId,a);
+
+
+    }
+    @RequestMapping(value = "/initAuthor", method = RequestMethod.GET, produces = "application/json")
+    public Author initAuthor() throws SQLException, ClassNotFoundException {
+        return new Author();
+    }
+    @RequestMapping(value = "/searchauthors/{authorName}", method = RequestMethod.GET, produces = "application/json")
+    public List<Author> readAuthorsByName(@PathVariable String authorName) throws SQLException, ClassNotFoundException {
+
+            List<Author> authors = adao.readAllAuthorsByName(authorName);
+            if (authors != null && !authors.isEmpty()) {
+                for (Author a : authors)
+                    a.setBooks(bdao.readByAuthor(a.getAuthorId()));
+        }
+        return authors;
+    }
+    @RequestMapping(value = "/searchauthors", method = RequestMethod.GET, produces = "application/json")
+    public List<Author> defaultSearch() throws SQLException, ClassNotFoundException{
+        List<Author> authors= adao.readAllAuthors();
+        for (Author a : authors)
+            a.setBooks(bdao.readByAuthor(a.getAuthorId()));
+    return authors;
+    }
+
+    @RequestMapping(value = "/deleteAuthor/{authorId}", method=RequestMethod.GET, produces = "application/json")
+    public void deleteAuthor(@PathVariable int authorId) throws SQLException, ClassNotFoundException {
+        adao.deleteAuthor(authorId);
+    }
+
+    @RequestMapping(value = "/editAuthor/{id}",method =RequestMethod.GET, produces = "application/json")
+    public Author editAuthor(@PathVariable int id) throws SQLException, ClassNotFoundException {
+        Author author= adao.readAuthorByPk(id);
+        return author;
+
+    }
+    @RequestMapping(value = "/updateAuthor", method=RequestMethod.POST, consumes = "application/json")
+    public void updateAuthor(@RequestBody Author author) throws SQLException, ClassNotFoundException {
+        adao.updateAuthor(author);
+    }
+//-----------------------author done-----------
 
 //    @RequestMapping("/borrower")
 //    public String borrower() {
 //        return "borrower";
 //    }
 
-    @GetMapping("/editAuthor")
-    public String editAuthor(@RequestParam("authorId") int authorId, Model theModel) throws SQLException, ClassNotFoundException {
-        Author author = adminService.readAuthorByPk(authorId);
-        theModel.addAttribute(author);
-        return "editauthor";
-    }
+//    @RequestMapping(value = "/editAuthor",method =RequestMethod.GET, consumes = "application/json")
+//    public String editAuthor(@RequestParam("authorId") int authorId, Model theModel) throws SQLException, ClassNotFoundException {
+//        Author author = adminService.readAuthorByPk(authorId);
+//        theModel.addAttribute(author);
+//        return "editauthor";
+//    }
 
-    @PostMapping("/editAuthor")
-    public String editAuthor(@RequestParam("authorName") String authorName, @RequestParam("authorId") int authorId) throws SQLException, ClassNotFoundException {
-        Author author = new Author();
-        author.setAuthorId(authorId);
-        author.setAuthorName(authorName);
-        adminService.updateAuthor(author);
-        return "author";
-    }
 
-    @PostMapping("addAuthor")
-    public String editAuthor(@RequestParam("authorName") String authorName, @RequestParam("bookIds") int[] bookIds) throws SQLException, ClassNotFoundException {
-        adminService.addAuthor(authorName, bookIds);
-        return "author";
-    }
 
-    @GetMapping("deleteAuthor")
-    public String deleteAuthor(@RequestParam("authorId") int authorId) throws SQLException, ClassNotFoundException {
-        adminService.deleteAuthor(authorId);
-        return "author";
-    }
+//    @RequestMapping("/editAuthor", method=RequestMethod.POST, )
+//    public String editAuthor(@RequestParam("authorName") String authorName, @RequestParam("authorId") int authorId) throws SQLException, ClassNotFoundException {
+//        Author author = new Author();
+//        author.setAuthorId(authorId);
+//        author.setAuthorName(authorName);
+//        adminService.updateAuthor(author);
+//        return "author";
+//    }
+
+//    @PostMapping("addAuthor")
+//    public String editAuthor(@RequestParam("authorName") String authorName, @RequestParam("bookIds") int[] bookIds) throws SQLException, ClassNotFoundException {
+//        adminService.addAuthor(authorName, bookIds);
+//        return "author";
+//    }
+
+
+
 
     //Book--------------------
+    @RequestMapping(value = "/getBookByPk/{id}", method=RequestMethod.GET,produces = "application/json")
+    public Book getBookByPk(@PathVariable int id) throws SQLException, ClassNotFoundException {
+        Book book= bookDAO.readBookByPk(id);
+        List<Genre> genres;
+        List<Author> authors;
+        Publisher publisher;
+        genres=genreDAO.getGenresByBookId(book.getBookId());
+        authors=authorDAO.getAuthorsByBookId(book.getBookId());
+        publisher=publisherDAO.readPublisherByPk(book.getPubId());
+        book.setGenres(genres);
+        book.setAuthors(authors);
+        book.setPublisher(publisher);
+        return book;
+    }
+
+
+    @RequestMapping(value = "/initBook", method=RequestMethod.GET,produces = "application/json")
+    public Book initBook() {return new Book();}
+
+    @RequestMapping(value = "/searchBook/{title}", method = RequestMethod.GET, produces = "application/json")
+    public List<Book> searchBook(@PathVariable String title) throws SQLException, ClassNotFoundException {
+        List<Book> books = bookDAO.getBookByName(title);
+        if (books != null && !books.isEmpty()) {
+            List<Genre> genres;
+            List<Author> authors;
+            Publisher publisher;
+            for(Book a:books)
+            {
+                genres=genreDAO.getGenresByBookId(a.getBookId());
+                authors=authorDAO.getAuthorsByBookId(a.getBookId());
+                publisher=publisherDAO.readPublisherByPk(a.getPubId());
+                a.setGenres(genres);
+                a.setAuthors(authors);
+                a.setPublisher(publisher);
+            }
+        }
+        return books;
+    }
+    @RequestMapping(value = "/searchBook", method = RequestMethod.GET, produces = "application/json")
+    public List<Book> searchAllBook() throws SQLException, ClassNotFoundException {
+        List<Book> books = bookDAO.readAllBooks();
+        if (books != null && !books.isEmpty()) {
+            List<Genre> genres;
+            List<Author> authors;
+            Publisher publisher;
+            for(Book a:books)
+            {
+                genres=genreDAO.getGenresByBookId(a.getBookId());
+                authors=authorDAO.getAuthorsByBookId(a.getBookId());
+                publisher=publisherDAO.readPublisherByPk(a.getPubId());
+                a.setGenres(genres);
+                a.setAuthors(authors);
+                a.setPublisher(publisher);
+            }
+        }
+        return books;
+    }
+
+    @RequestMapping(value="/getAllPublisher",method = RequestMethod.GET, produces = "application/json")
+    public List<Publisher> getAllPublisher() throws SQLException, ClassNotFoundException {
+        List<Publisher> publishers= publisherDAO.readAllPublisher();
+        if (publishers != null && !publishers.isEmpty()) {
+            for(Publisher a:publishers)
+                a.setBooks(bookDAO.readByPublisher(a.getPublisherId()));
+        }
+        return publishers;
+    }
+    @RequestMapping(value="/iniPublisher",method = RequestMethod.GET, produces = "application/json")
+    public Publisher iniPublisher() throws SQLException, ClassNotFoundException {
+        return new Publisher();
+    }
+    @RequestMapping(value="/updatePublisher",method = RequestMethod.POST, consumes = "application/json")
+    public void updatePublisher(@RequestBody Publisher publisher) throws SQLException, ClassNotFoundException {
+        publisherDAO.updatePublisher(publisher);
+    }
+    @RequestMapping(value="/deletePublisher/{id}",method = RequestMethod.GET, produces = "application/json")
+    public void deletePublisher(@PathVariable int id) throws SQLException, ClassNotFoundException {
+        publisherDAO.deletePublisher(id);
+    }
+    @RequestMapping(value="/addPublisher",method = RequestMethod.POST, consumes = "application/json")
+    public void addPublisher(@RequestBody Publisher publisher) throws SQLException, ClassNotFoundException {
+        publisherDAO.addPublisher(publisher);
+    }
+
+
+    @RequestMapping(value="/getPublisherByPk/{id}",method = RequestMethod.GET, produces = "application/json")
+    public Publisher getPublisherByPk(@PathVariable int id) throws SQLException, ClassNotFoundException {
+        Publisher publisher= publisherDAO.readPublisherByPk(id);
+        if (publisher != null)
+            publisher.setBooks(bookDAO.readByPublisher(publisher.getPublisherId()));
+        return publisher;
+    }
+
+
+
+    @RequestMapping(value="/getAllGenre",method = RequestMethod.GET, produces = "application/json")
+    public List<Genre> getAllGenre() throws SQLException, ClassNotFoundException {
+        return genreDAO.readAllGenre();
+    }
+    @RequestMapping(value="/updateBook",method = RequestMethod.POST, consumes = "application/json")
+    public void updateBook(@RequestBody Book book) throws SQLException, ClassNotFoundException {
+       bookDAO.editBook(book.getTitle(),book.getBookId(),book.getPubId(),book.getGenreIds(),book.getAuthorIds());
+    }
+    @RequestMapping(value="/deleteBook/{id}",method = RequestMethod.GET, produces = "application/json")
+    public void deleteBook(@PathVariable int id) throws SQLException, ClassNotFoundException {
+        bookDAO.deleteBook(id);
+    }
+
+    @RequestMapping(value="/addBook",method = RequestMethod.POST, consumes = "application/json")
+    public void addBook(@RequestBody Book book) throws SQLException, ClassNotFoundException {
+        bookDAO.addBookWithID(book);
+    }
+
+
     @RequestMapping("/book")
-    public String book(Model model) {
-        model.addAttribute("adminService", adminService);
+    public String book(Model model) throws SQLException, ClassNotFoundException {
+ //       model.addAttribute("adminService", adminService);
+        List<Genre> genreList=genreDAO.readAllGenre();
+        List<Author> authorList=authorDAO.readAllAuthors();
+        List<Publisher> publisherList=publisherDAO.readAllPublisher();
+        model.addAttribute("genreList",genreList);
+        model.addAttribute("authorList",authorList);
+
         return "book";
     }
 
-    @GetMapping("/editBook")
-    public String editBook(@RequestParam("bookId") int bookId, Model model) throws SQLException, ClassNotFoundException {
-        Book book = adminService.getBookByPk(bookId);
-        model.addAttribute("book", book);
-        return "editBook";
-    }
+//    @GetMapping("/editBook")
+//    public String editBook(@RequestParam("bookId") int bookId, Model model) throws SQLException, ClassNotFoundException {
+//        Book book = adminService.getBookByPk(bookId);
+//        model.addAttribute("book", book);
+//        return "editBook";
+//    }
 
-    @PostMapping("/editBook")
-    public String editBook(@RequestParam("bookId") int bookId, @RequestParam("genreIds") int[] genreIds, @RequestParam("publisherId") int publisherId, @RequestParam("authorIds") int[] authorIds) {
-        adminService.editBook(bookId, publisherId, genreIds, authorIds);
-        return "book";
-    }
+//    @PostMapping("/editBook")
+//    public String editBook(@RequestParam("bookId") int bookId, @RequestParam("genreIds") int[] genreIds, @RequestParam("publisherId") int publisherId, @RequestParam("authorIds") int[] authorIds) {
+//        adminService.editBook(bookId, publisherId, genreIds, authorIds);
+//        return "book";
+//    }
 
-    @GetMapping("/deleteBook")
-    public String deleteBook(@RequestParam("bookId") int bookId) throws SQLException, ClassNotFoundException {
-        adminService.deleteBook(bookId);
-        return "book";
-    }
 
-    @PostMapping("/addBook")
-    public String addBook(@RequestParam("bookName") String bookName, @RequestParam("authorIds") int[] authorIds, @RequestParam("genreIds") int[] genreIds, @RequestParam("publisherId") int publisherId) throws SQLException, ClassNotFoundException {
-        adminService.addBook(bookName, publisherId, authorIds, genreIds);
-        return "book";
-    }
+
+
+
+
+
     //Change Due date
 
-    @RequestMapping("/change_due")
-    public String changeDue(Model model) {
-        model.addAttribute("adminService", adminService);
-        return "change_due";
+
+
+    @RequestMapping(value="/getAllBookLoans", method=RequestMethod.GET, produces = "application/json")
+    public List<Book_Loan> getAllBookLoans() throws SQLException, ClassNotFoundException {
+        Book book;
+        Borrower borrower;
+        Library branch ;
+        List<Book_Loan>  book_loans= book_loanDAO.readAllLoanRecord();
+
+        for(Book_Loan book_loan:book_loans)
+        {
+            book=bdao.readBookByPk(book_loan.getBookId());
+            borrower=borrowerDAO.readBorrowerByPk(book_loan.getCardNo());
+            branch=libraryDAO.readLibraryByPk(book_loan.getBranchId());
+            book_loan.setBook(book);
+            book_loan.setBorrower(borrower);
+            book_loan.setBranch(branch);
+        }
+        return book_loans;
     }
 
-    @GetMapping("/editDue")
-    public String editDue(@RequestParam("bookId") int bookId, @RequestParam("branchId") int branchId, @RequestParam("cardNo") int cardNo, Model model) throws SQLException, ClassNotFoundException {
-        Book_Loan book_loan = adminService.getBookLoanByPk(bookId, branchId, cardNo);
-        Book book = adminService.getBookByPk(bookId);
-        Library branch = adminService.getLibraryByPk(branchId);
-        Borrower borrower = adminService.getBorrowerByPk(cardNo);
-        book_loan.setBranch(branch);
-        book_loan.setBook(book);
-        book_loan.setBorrower(borrower);
-        model.addAttribute("book_loan", book_loan);
-        return "editDueDate";
+    @RequestMapping(value = "/initBookLoan", method = RequestMethod.GET, produces = "application/json")
+    public Book_Loan initBookLoan() throws SQLException, ClassNotFoundException {
+        return new Book_Loan();
     }
 
-    @PostMapping("/editDue")
-    public String editDue(@RequestParam("bookId") int bookId, @RequestParam("branchId") int branchId, @RequestParam("cardNo") int cardNo, @RequestParam("dueDate") Date dueDate) throws SQLException, ClassNotFoundException {
-        Book_Loan book_loan = adminService.getBookLoanByPk(bookId, branchId, cardNo);
-        book_loan.setDueDate(dueDate);
-        adminService.updateBookLoan(book_loan);
-        return "change_due";
+    @RequestMapping(value = "/updateDueDate", method = RequestMethod.POST, consumes = "application/json")
+    public void updateDueDate(@RequestBody Book_Loan book_loan_temp) throws SQLException, ClassNotFoundException {
+        book_loanDAO.updateBookLoan(book_loan_temp);
     }
+
+
+//    @RequestMapping(value="/editDue" method=RequestMethod.POST, consumes = "application/json")
+//    public String editDue(@RequestBody Book_Loan book_loan) throws SQLException, ClassNotFoundException {
+//        Book_Loan book_loan = adminService.getBookLoanByPk(bookId, branchId, cardNo);
+//        Book book = bookDAO.readBookByPk(bookId);
+//        Library branch = adminService.getLibraryByPk(branchId);
+//        Borrower borrower = adminService.getBorrowerByPk(cardNo);
+//        book_loan.setBranch(branch);
+//        book_loan.setBook(book);
+//        book_loan.setBorrower(borrower);
+//        model.addAttribute("book_loan", book_loan);
+//        return "editDueDate";
+//    }
+
+    @RequestMapping(value = "/editDue", method = RequestMethod.POST, consumes = "application/json",produces = "application/json")
+    public Book_Loan editDue(@RequestBody Book_Loan book_loan) throws SQLException, ClassNotFoundException {
+      Book_Loan book_loan1 =book_loanDAO.readBookLoanByPk(book_loan);
+      return book_loan1;
+    }
+
 
     //publisher ----------------
     @RequestMapping("/publisher")
@@ -132,9 +360,9 @@ public class AdminController {
         return "publisher";
     }
 
-    @GetMapping("/editPublisher")
-    public String editPublisher(@RequestParam("publisherId") int publisherId, Model model) throws SQLException, ClassNotFoundException {
-        Publisher publisher = adminService.getPublisherById(publisherId);
+    @GetMapping("/editPublisher/{id}")
+    public String editPublisher(@PathVariable int id, Model model) throws SQLException, ClassNotFoundException {
+        Publisher publisher = publisherDAO.readPublisherByPk(id);
         model.addAttribute("publisher", publisher);
         model.addAttribute("adminService", adminService);
         return "editPublisher";
@@ -151,28 +379,22 @@ public class AdminController {
         return "redirect:/admin/publisher";
     }
 
-    @GetMapping("/deletePublisher")
-    public String deletePublisher(@RequestParam("publisherId") int publisherId, Model model) throws SQLException, ClassNotFoundException {
-        adminService.deletePublisher(publisherId);
-        return "redirect:/admin/publisher";
-    }
 
-    @PostMapping("/addPublisher")
-    public String addAuthor(@RequestParam("publisherName") String name, @RequestParam("publisherAddress") String address, @RequestParam("publisherPhone") String phone) throws SQLException, ClassNotFoundException {
-        Publisher publisher = new Publisher();
-        publisher.setPublisherPhone(phone);
-        publisher.setPublisherName(name);
-        publisher.setPublisherAddress(address);
-        adminService.addPublisher(publisher);
-        return "redirect:/admin/publisher";
-    }
 
     //Library --------------
+    @RequestMapping(value = "/getLibraryById/{id}", method=RequestMethod.GET,produces = "application/json")
+    public Library getLibraryById(@PathVariable int id) throws SQLException, ClassNotFoundException
+    {return libraryDAO.readLibraryByPk(id);}
+
+
+
+
     @RequestMapping("/library")
     public String library(Model model) {
         model.addAttribute("adminService", adminService);
         return "library";
     }
+
 
     @GetMapping("/editLibrary")
     public String editLibrary(@RequestParam("libraryId") int libraryId, Model model) throws SQLException, ClassNotFoundException {
@@ -237,5 +459,10 @@ public class AdminController {
 
 
     }
+    //----------
+    @RequestMapping(value = "/getBookCopyById/{branchId}/{bookId}", method=RequestMethod.GET,produces = "application/json")
+    public Book_Copy getBookByPk(@PathVariable int branchId, @PathVariable int bookId) throws SQLException, ClassNotFoundException {
+        return book_copyDAO.readBookCopyByPk(bookId,branchId);}
+
 
 }

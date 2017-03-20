@@ -33,21 +33,21 @@ public class AdminService {
 	PublisherDAO publisherDAO;
 	@Autowired
 	BookDAO bookDAO;
-
-	@Transactional
-	public void addAuthor(String authorName, int[] bookIds) throws SQLException, ClassNotFoundException {
-		adao.addAuthor(authorName);
-		int authorId=adao.searchAuthorIdAfterInsert(authorName);
-		for (Integer id:bookIds)
-		{
-		adao.addAuthorBook(authorId,id);
-		}
-
-	}
-	@Transactional
-	public void updateAuthor(Author author) throws SQLException, ClassNotFoundException {adao.updateAuthor(author);}
-	@Transactional
-	public void deleteAuthor(int authorId) throws SQLException, ClassNotFoundException {adao.deleteAuthor(authorId);}
+//
+//	@Transactional
+//	public void addAuthor(String authorName, int[] bookIds) throws SQLException, ClassNotFoundException {
+//		adao.addAuthor(authorName);
+//		int authorId=adao.searchAuthorIdAfterInsert(authorName);
+//		for (Integer id:bookIds)
+//		{
+//		adao.addAuthorBook(authorId,id);
+//		}
+//
+//	}
+//	@Transactional
+//	public void updateAuthor(Author author) throws SQLException, ClassNotFoundException {adao.updateAuthor(author);}
+//	@Transactional
+//	public void deleteAuthor(int authorId) throws SQLException, ClassNotFoundException {adao.deleteAuthor(authorId);}
 	@Transactional
 	public List<Author> readAuthors(Integer pageNo, String authorName) throws SQLException, ClassNotFoundException {
 		List<Author> authors;
@@ -85,29 +85,29 @@ public class AdminService {
 	public List<Genre> readAllGenres() throws SQLException, ClassNotFoundException {return genreDAO.readAllGenre();}
 	@Transactional
 	public List<Author> readAllAuthors() throws SQLException, ClassNotFoundException {return authorDAO.readAllAuthors();}
-	@Transactional
-	public Author readAuthorByPk(Integer authorId) throws SQLException, ClassNotFoundException {return adao.readAuthorByPk(authorId);}
-	@Transactional
-	public Book getBookByPk(Integer bookId) throws SQLException, ClassNotFoundException {return bdao.readBookByPk(bookId);}
+//	@Transactional
+//	public Author readAuthorByPk(Integer authorId) throws SQLException, ClassNotFoundException {return adao.readAuthorByPk(authorId);}
+//	@Transactional
+//	public Book getBookByPk(Integer bookId) throws SQLException, ClassNotFoundException {return bdao.readBookByPk(bookId);}
 	@Transactional
 	public List<Publisher> getAllPublishers() throws SQLException, ClassNotFoundException {return publisherDao.readAllPublisher();}
 	@Transactional
 	public List<Book> getBooksByPublisher(int publisherId) throws SQLException, ClassNotFoundException {return bdao.readByPublisher(publisherId);}
-	@Transactional
-	public void editBook(int bookId, int publisherId,int[] genreIds, int[]authorIds){
-		bdao.editBook(bookId,publisherId,genreIds,authorIds);
-	}
+//	@Transactional
+//	public void editBook(int bookId, int publisherId,int[] genreIds, int[]authorIds){
+//		bdao.editBook(bookId,publisherId,genreIds,authorIds);
+//	}
 	@Transactional
 	public void deleteBook(int bookId) throws SQLException, ClassNotFoundException {bdao.deleteBook(bookId);}
-	@Transactional
-	public void addBook(String bookName,int publisherId,int[] authorIds,int[] genreIds) throws SQLException, ClassNotFoundException {
-	    bdao.addBook(bookName,publisherId,authorIds,genreIds);
-	    int bookId=bdao.searchBookByTitle(bookName);
-	    for(Integer a:authorIds)
-	        bdao.addBookAuthors(a,bookId);
-	    for(Integer a:genreIds)
-	        bdao.addBookGenres(a,bookId);
-	}
+//	@Transactional
+//	public void addBook(String bookName,int publisherId,int[] authorIds,int[] genreIds) throws SQLException, ClassNotFoundException {
+//	    bdao.addBook(bookName,publisherId,authorIds,genreIds);
+//	    int bookId=bdao.searchBookByTitle(bookName);
+//	    for(Integer a:authorIds)
+//	        bdao.addBookAuthors(a,bookId);
+//	    for(Integer a:genreIds)
+//	        bdao.addBookGenres(a,bookId);
+//	}
 	@Transactional
     public List<Book_Loan> readAllBookLoan(Integer pageNo,String borrowerName) throws SQLException, ClassNotFoundException {
         List<Book_Loan> book_loans;
@@ -134,8 +134,8 @@ public class AdminService {
     public Library getLibraryByPk(Integer libraryId) throws SQLException, ClassNotFoundException {return libraryDAO.readLibraryByPk(libraryId);}
 	@Transactional
     public Borrower getBorrowerByPk(Integer cardNo) throws SQLException, ClassNotFoundException {return borrowerDAO.readBorrowerByPk(cardNo);}
-    @Transactional
-    public Book_Loan getBookLoanByPk(Integer bookId,Integer branchId,Integer cardNo) throws SQLException, ClassNotFoundException {return book_loanDAO.readBookLoanByPk(bookId,branchId,cardNo);}
+//    @Transactional
+//    public Book_Loan getBookLoanByPk(Integer bookId,Integer branchId,Integer cardNo) throws SQLException, ClassNotFoundException {return book_loanDAO.readBookLoanByPk(bookId,branchId,cardNo);}
     @Transactional
     public void updateBookLoan(Book_Loan book_loan) throws SQLException, ClassNotFoundException {book_loanDAO.updateBookLoan(book_loan);}
 	@Transactional

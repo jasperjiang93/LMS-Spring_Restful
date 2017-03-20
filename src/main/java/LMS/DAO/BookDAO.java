@@ -1,9 +1,13 @@
 package LMS.DAO;
 
 import LMS.Entity.*;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -16,15 +20,31 @@ public class BookDAO extends BaseDAO implements ResultSetExtractor<List<Book>> {
 
 
 
-    public void addBook(String bookName,int publisherId,int[] authorIds,int[] genreIds) throws SQLException, ClassNotFoundException{
-        template.update("insert into tbl_book(title,pubId) values(?,?)",new Object[]{bookName,publisherId});
-    }
+//    public void addBookDetails(String bookName,int publisherId,int[] authorIds,int[] genreIds) throws SQLException, ClassNotFoundException{
+
     public int searchBookByTitle(String title){
         List<Book> books =  template.query("select * from tbl_book where title= ?", new Object[]{title},this);
         return books.get(0).getBookId();
     }
-    public Integer addBookWithID(Book book) throws ClassNotFoundException, SQLException{
-        return template.update("insert into tbl_book (title, pubId) values (? , ?)", new Object[]{book.getTitle(), book.getPublisher().getPublisherId()});
+    public void addBookWithID(Book book) throws ClassNotFoundException, SQLException{
+        final String title=book.getTitle();
+        final int pubId=book.getPubId();
+        final String INSERT_SQL = "insert into tbl_book (title, pubId) values (? , ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        template.update(new PreparedStatementCreator() {
+            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                PreparedStatement ps = connection.prepareStatement(INSERT_SQL, new String[] { "bookId" });
+                ps.setString(1, title);
+                ps.setInt(2,pubId);
+                return ps;
+            }
+        }, keyHolder);
+        int bookId=keyHolder.getKey().intValue();
+
+        for(Integer a:book.getGenreIds())
+            template.update("insert into tbl_book_genres values(?,?)",new Object[]{a,bookId});
+        for(Integer a:book.getAuthorIds())
+            template.update("insert into tbl_book_authors values(?,?)",new Object[]{bookId,a});
     }
     public void addBookAuthors(Integer authorId, Integer bookId) throws ClassNotFoundException, SQLException{
         template.update("insert into tbl_book_authors values (? , ?)", new Object[]{bookId, authorId});
@@ -76,6 +96,12 @@ public class BookDAO extends BaseDAO implements ResultSetExtractor<List<Book>> {
                 "and publisher.publisherName like ?", new Object[]{bookName,genre,authorName,publisherName},this);
     }
 
+    public List<Book> getBookByName(String title){
+        return template.query("select * from tbl_book where title like?",new Object[]{"%"+title+"%"},this);
+    }
+
+
+
     public List<Book> readBooksByPage(Integer pageNo) throws ClassNotFoundException, SQLException{
             setPageNo(pageNo);
             return template.query("select * from tbl_book", this);
@@ -106,8 +132,8 @@ public class BookDAO extends BaseDAO implements ResultSetExtractor<List<Book>> {
         }
         return null;
     }
-    public void editBook(int bookId, int publisherId,int[] genreIds, int[]authorIds){
-        template.update("update tbl_book set pubId=? where bookId=?",new Object[]{publisherId,bookId});
+    public void editBook(String title,int bookId, int publisherId,int[] genreIds, int[]authorIds){
+        template.update("update tbl_book set title=?, pubId=? where bookId=?",new Object[]{title,publisherId,bookId});
         template.update("delete from tbl_book_genres where bookId=?",new Object[]{bookId});
         for(Integer a:genreIds)
             template.update("insert into tbl_book_genres values(?,?)",new Object[]{a,bookId});

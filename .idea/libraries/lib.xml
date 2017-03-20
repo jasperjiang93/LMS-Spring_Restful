@@ -1,0 +1,27 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/jcl-over-slf4j-1.6.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/log4j-1.2.15.jar!/" />
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/spring-tx-4.3.3.RELEASE.jar!/" />
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/spring-webmvc-4.3.3.RELEASE.jar!/" />
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/commons-dbcp-1.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/spring-aop-4.3.3.RELEASE.jar!/" />
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/commons-pool-1.5.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/mysql-connector-java-5.1.40.jar!/" />
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/aspectjrt-1.6.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/slf4j-api-1.6.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/jstl-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/spring-beans-4.3.3.RELEASE.jar!/" />
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/spring-context-4.3.3.RELEASE.jar!/" />
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/spring-web-4.3.3.RELEASE.jar!/" />
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/spring-jdbc-4.3.3.RELEASE.jar!/" />
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/slf4j-log4j12-1.6.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/spring-expression-4.3.3.RELEASE.jar!/" />
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/javax.inject-1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/target/lms-1.0.0-BUILD-SNAPSHOT/WEB-INF/lib/spring-core-4.3.3.RELEASE.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

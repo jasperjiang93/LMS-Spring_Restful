@@ -1,0 +1,84 @@
+<div class="container-fluid" ng-controller="borrowerMGMTController">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Borrower</h1>
+        </div>
+    </div>
+
+
+    <div style="height:50px">
+        <button type="button"  class="btn btn-primary" ng-click="showLogin()">Log in</button>
+    </div>
+
+
+
+    <uib-tabset active="active">
+        <uib-tab index="0" heading="Borrower Book">
+            <select ng-model="library.libraryId">
+                <option ng-repeat="a in libraryList" value="{{a.libraryId}}">{{a.libraryName}}</option>
+            </select>
+            <button class="btn btn-success"  ng-click="reloadBook()" >GO!!</button>
+            <table class="table table-striped" id="booksTable" >
+                <tr>
+                    <th>#</th>
+                    <th>Book Name</th>
+                    <th>Publisher</th>
+                    <th>Genre</th>
+                    <th>Author</th>
+                    <th>Check Out</th>
+                </tr>
+                <tr ng-repeat="a in bookList">
+                    <td>{{$index+1}}</td>
+                    <td>{{a.title}}</td>
+                    <td>{{a.publisher.publisherName}}</td>
+                    <td><span ng-repeat="b in a.genres">{{b.genre_name}} |</span></td>
+                    <td><span ng-repeat="c in a.authors">{{c.authorName}} |</span></td>
+                    <td><button ng-click="checkOut(a.bookId)" class="btn btn-warning">Click</button></td>
+                </tr>
+            </table>
+        </uib-tab>
+        <uib-tab index="1" heading="Return Book">
+            <table class="table table-striped" id="bookLoanTable" >
+                <tr>
+                    <th>#</th>
+                    <th>Book</th>
+                    <th>Date Out</th>
+                    <th>Due Date</th>
+                    <th>Return</th>
+                </tr>
+                <tr ng-repeat="a in bookLoans">
+                    <td>1{{$index+1}}</td>
+                    <td>{{a.book.title}}</td>
+                    <td>{{a.dateOut}}</td>
+                    <td>{{a.dueDate}}</td>
+                    <td><button ng-click="return(a)" class="btn btn-warning">Click</button></td>
+                </tr>
+            </table>
+
+
+        </uib-tab>
+    </uib-tabset>
+
+
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" id="loginModal" modal="loginModal"
+         aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">{{title}}</h4>
+                </div>
+                <div class="modal-body" align="center">
+                    <h4>Please Enter your Card Number</h4>
+                    <input type="text" style="width:20%;"  class="form-control" required="required"  ng-model="borrower.cardNo">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            ng-click="closeLoginModal()">Close</button>
+                    <button type="button" class="btn btn-primary"
+                            ng-click="submit()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>

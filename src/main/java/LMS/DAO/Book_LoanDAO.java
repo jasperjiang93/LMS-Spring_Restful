@@ -5,10 +5,11 @@ import LMS.Entity.Book_Loan;
 import LMS.Entity.Borrower;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
-import java.sql.Date;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,9 +33,9 @@ public class Book_LoanDAO extends BaseDAO implements ResultSetExtractor<List<Boo
                 new Object[]{bookId,branchId});
 
     }
-    public Book_Loan readBookLoanByPk(Integer bookId,Integer branchID,Integer cardNo) throws ClassNotFoundException, SQLException{
-       List<Book_Loan> book_loans=  template.query("select * from tbl_book_loans where bookId=? and branchId=? and cardNo=?",
-               new Object[]{bookId,branchID,cardNo},this);
+    public Book_Loan readBookLoanByPk(Book_Loan book_loan) throws ClassNotFoundException, SQLException{
+       List<Book_Loan> book_loans=  template.query("select * from tbl_book_loans where cardNo=? and bookId=? and branchId=? and date(dateOut)=?" ,
+               new Object[]{book_loan.getCardNo(),book_loan.getBookId(),book_loan.getBranchId(),new java.sql.Date(book_loan.getDateOut().getTime())},this);
         if(book_loans!=null && !book_loans.isEmpty()){
             return book_loans.get(0);
         }
@@ -46,16 +47,16 @@ public class Book_LoanDAO extends BaseDAO implements ResultSetExtractor<List<Boo
                 new Object[]{cardNo},this);
     return book_loans;
     }
-    public void returnBook(int cardNo, int bookId, int branchId, Date dateOut) throws ClassNotFoundException, SQLException{
-
-        template.update("delete from tbl_book_loans where cardNo=? and bookId=? and branchId=? and dateOut=?",new Object[]{cardNo,bookId,branchId,dateOut});
+    public void returnBook(int cardNo, int bookId, int branchId,Date dateOut) throws ClassNotFoundException, SQLException{
+        template.update("delete from tbl_book_loans where cardNo=? and bookId=? and branchId=? and date(dateOut)=? ",new Object[]{cardNo,bookId,branchId,new java.sql.Date(dateOut.getTime())});
         template.update("update tbl_book_copies set noOfCopies=noOfcopies+1 where bookId=? and branchId=?",new Object[]{bookId,branchId});
     }
 
     public void updateBookLoan(Book_Loan book_loan)throws ClassNotFoundException, SQLException{
 
-        template.update("update tbl_book_loans set dueDate=? where bookId=? and branchId=? and cardNo=?"
-                ,new Object[]{new java.sql.Date(book_loan.getDueDate().getTime()) ,book_loan.getBookId(),book_loan.getBranchId(),book_loan.getCardNo()});
+        template.update("update tbl_book_loans set dueDate=? where bookId=? and branchId=? and cardNo=? and date(dateOut)=?"
+                ,new Object[]{new java.sql.Date(book_loan.getDueDate().getTime()) ,book_loan.getBookId(),book_loan.getBranchId(),
+                        book_loan.getCardNo(),new java.sql.Date(book_loan.getDateOut().getTime())});
     }
     public List<Book_Loan> readBookLoanByName(String borrowerName)throws ClassNotFoundException, SQLException {
         BorrowerDAO borrowerDAO=new BorrowerDAO();

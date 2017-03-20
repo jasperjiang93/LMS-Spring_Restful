@@ -1,8 +1,13 @@
 package LMS.DAO;
 
 import LMS.Entity.Author;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -20,6 +25,21 @@ public class AuthorDAO extends BaseDAO implements ResultSetExtractor<List<Author
         List<Author> authors =  template.query("select * from tbl_author where authorName= ?", new Object[]{authorName},this);
             return authors.get(0).getAuthorId();
     }
+    public Integer addAuthorkWithID(String authorName) throws ClassNotFoundException, SQLException{
+        final String name=authorName;
+        final String INSERT_SQL = "insert into tbl_author (authorName) values (?)";
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        template.update(new PreparedStatementCreator() {
+            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                PreparedStatement ps = connection.prepareStatement(INSERT_SQL, new String[] { "authorId" });
+                ps.setString(1, name);
+                return ps;
+            }
+        }, keyHolder);
+        return keyHolder.getKey().intValue();
+    }
+
     public void addAuthorBook(int authorId, int bookId){template.update("insert into tbl_book_authors values(?,?)", new Object[] {bookId,authorId});
     }
 //

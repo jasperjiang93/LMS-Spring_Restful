@@ -14,6 +14,24 @@ public class Book implements Serializable {
     private Publisher publisher;
     private List<Author> authors;
     private List<Genre> genres;
+    private int[] authorIds;
+    private int[] genreIds;
+
+    public int[] getAuthorIds() {
+        return authorIds;
+    }
+
+    public void setAuthorIds(int[] authorIds) {
+        this.authorIds = authorIds;
+    }
+
+    public int[] getGenreIds() {
+        return genreIds;
+    }
+
+    public void setGenreIds(int[] genreIds) {
+        this.genreIds = genreIds;
+    }
 
     public int getPubId() {
         return pubId;

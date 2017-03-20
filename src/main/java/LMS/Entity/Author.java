@@ -12,6 +12,15 @@ public class Author implements Serializable{
     private Integer authorId;
     private String authorName;
     private List<Book> books;
+    private int[] bookIds;
+
+    public int[] getBookIds() {
+        return bookIds;
+    }
+
+    public void setBookIds(int[] bookIds) {
+        this.bookIds = bookIds;
+    }
 
     public Integer getAuthorId() {
         return authorId;

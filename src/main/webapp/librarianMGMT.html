@@ -1,0 +1,113 @@
+<div class="container-fluid" ng-controller="librarianController">
+
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Librarian</h1>
+        </div>
+    </div>
+
+
+        <input type="text" class="form-control" placeholder="Library Name" style="width:20%"
+               aria-describedby="basic-addon1" ng-model="searchString"
+               id="searchString" ng-change="searchLibrary()">
+        <div>
+            <ul class="pagination">
+                <li><a href="" ng-click="pagination.prevPage()">&laquo;</a></li>
+                <li ng-repeat="n in [] | range: pagination.numPages"
+                    ng-class="{active: n == pagination.page}"><a href=""
+                                                                 ng-click="pagination.toPageId(n)">{{n + 1}}</a></li>
+                <li><a href="" ng-click="pagination.nextPage()">&raquo;</a></li>
+            </ul>
+        </div>
+
+    <uib-tabset active="active">
+        <uib-tab index="0" heading="View Library">
+            <table class="table table-striped" id="librariesTable" >
+            <tr>
+                <th>#</th>
+                <th>Library Name</th>
+                <th>Address</th>
+                <th>Books</th>
+                <th>Edit</th>
+            </tr>
+                <tr ng-repeat="a in libraryList | startFrom: pagination.page * pagination.perPage | limitTo: pagination.perPage">
+                    <td>{{$index+1}}</td>
+                    <td>{{a.libraryName}}</td>
+                    <td>{{a.libraryAdderess}}</td>
+                    <td><span ng-repeat="b in a.books">{{b.title}} |</span></td>
+                    <td><button ng-click="showEditModal(a.libraryId)" class="btn btn-sm btn-warning">Edit</button></td>
+                </tr>
+            </tr>
+        </table>
+        </uib-tab>
+
+
+            <uib-tab index="1" heading="View Copy">
+                <h4>Please Choose the Library</h4>
+                <select ng-model="book_copy.branchId" style="width:20%">
+                    <option ng-repeat="libSelection in libraryList" value="{{libSelection.libraryId}}">{{libSelection.libraryName}}</option>
+                </select>
+                <h4>Choose the book</h4>
+                <select ng-model="book_copy.bookId" style="width:20%">
+                    <option ng-repeat="bookSelection in bookList" value="{{bookSelection.bookId}}">{{bookSelection.title}}</option>
+                </select><br/><br/>
+                <button type="button" class="btn btn-sm btn-success" ng-click="showCopyModal()">Check Copy</button>
+            </uib-tab>
+    </uib-tabset>
+
+
+
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" id="editLibraryModal" modal="editLibraryModal"
+         aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">{{title}}</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Enter Library Name</p><br/>
+                    <input type="text"  class="form-control"  ng-model="library.libraryName">
+                    <p>Library Address</p><br/>
+                    <input type="text"  class="form-control"  ng-model="library.libraryAdderess">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            ng-click="closeEditModal()">Close</button>
+                    <button type="button" class="btn btn-primary"
+                            ng-click="editLibrary(library)">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" id="editCopyModal" modal="editCopyModal"
+         aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel1">{{title}}</h4>
+                </div>
+                <div class="modal-body">
+                    <h4>Library Name: {{book_copy_library.libraryName}}</h4><br/>
+                    <h4>Book: {{book_copy_book.title}}</h4><br/>
+                    <h4>Number of Copy:   <input type="text" style="width:20%" class="form-control"  ng-model="book_copy.noOfCopies"></h4><br/>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            ng-click="closeCopyModal()">Close</button>
+                    <button type="button" class="btn btn-primary"
+                            ng-click="editCopy()">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+</div>
+        <!-- /#page-wrapper -->

@@ -1,0 +1,101 @@
+
+<div class="container-fluid" ng-controller="bookController">
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Admin
+            <small>Book</small></h1>
+        </div>
+    </div>
+
+            <div >
+                <input type="text" class="form-control" style="width:20%" placeholder="Book Name"
+                       aria-describedby="basic-addon1" ng-model="searchString"
+                       id="searchString" ng-change="searchBook()">
+                    <ul class="pagination">
+                        <li><a href="" ng-click="pagination.prevPage()">&laquo;</a></li>
+                        <li ng-repeat="n in [] | range: pagination.numPages"
+                            ng-class="{active: n == pagination.page}"><a href=""
+                                                                         ng-click="pagination.toPageId(n)">{{n + 1}}</a></li>
+                        <li><a href="" ng-click="pagination.nextPage()">&raquo;</a></li>
+                    </ul>
+            </div>
+
+            <uib-tabset active="active">
+                <uib-tab index="0" heading="View Books">
+                    <div class="row">
+                        <div class="col-md-4 text-center" ng-repeat="a in bookList | startFrom: pagination.page * pagination.perPage | limitTo: pagination.perPage">
+                            <div class="thumbnail">
+                            <img class="img-responsive" src="http://placehold.it/750x450" alt="">
+                            <div class="caption">
+                                <h3>{{a.title}}</h3>
+                                <p>Genre: <span ng-repeat="b in a.genres">{{b.genre_name}} |</span></p>
+                                <p>Author: <span ng-repeat="c in a.authors">{{c.authorName}} |</span></p>
+                                </div>
+                                <button type="button" class="btn btn-warning" ng-click="showEditModal(a.bookId)">Edit</button>
+                                <button ng-click="delete(a.bookId)" class="btn btn-danger" style="height:35px;width:65px">Delete</button>
+                            </div>
+                           </div>
+                    </div>
+
+
+                </uib-tab>
+                <uib-tab index="1" heading="Add Book">
+                    <div align="center">
+                    <h4>Enter Book Name</h4>
+                    <input type="text"  class="form-control"  ng-model="newBook.title" style="width:20%">
+                    <h4>Publisher</h4>
+                    <select ng-model="newBook.pubId" style="width:20%">
+                        <option ng-repeat="a in publisherList" value="{{a.publisherId}}">{{a.publisherName}}</option>
+                    </select>
+                    <h4>Authors</h4>
+                    <select ng-model="newBook.authorIds" multiple="multiple" size="5" style="width:20%">
+                        <option ng-repeat="a in authorList" value="{{a.authorId}}">{{a.authorName}}</option>
+                    </select>
+                    <h4>Genres</h4>
+                    <select ng-model="newBook.genreIds" multiple="multiple" size="5" style="width:20%">
+                        <option ng-repeat="a in genreList" value="{{a.genre_id}}">{{a.genre_name}}</option>
+                    </select>
+                    <br/>
+                <button type="button" class="btn btn-sm btn-success" ng-click="addBook()">Add Book</button>
+                    </div>
+                </uib-tab>
+            </uib-tabset>
+
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" id="editBookModal" modal="editBookModal"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">{{title}}</h4>
+                    </div>
+                    <div class="modal-body" align="center">
+                        <h4>Enter Book Name</h4>
+                        <input type="text"  class="form-control" style="width:30%" ng-model="book.title">
+                        <h4>Publisher</h4>
+                        <select ng-model="book.pubId" style="width:30%">
+                            <option ng-repeat="a in publisherList" value="{{a.publisherId}}">{{a.publisherName}}</option>
+                        </select>
+                        <h4>Authors</h4>
+                        <select ng-model="book.authorIds" multiple="multiple" size="5" style="width:30%">
+                            <option ng-repeat="a in authorList" value="{{a.authorId}}">{{a.authorName}}</option>
+                        </select>
+                        <h4>Genres</h4>
+                        <select ng-model="book.genreIds" multiple="multiple" size="5" style="width:30%">
+                            <option ng-repeat="a in genreList" value="{{a.genre_id}}">{{a.genre_name}}</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default"
+                                ng-click="closeEditModal()">Close</button>
+                        <button type="button" class="btn btn-primary"
+                                ng-click="editBook(book)">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        <!-- /#page-wrapper -->
+
+

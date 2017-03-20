@@ -1,5 +1,7 @@
 package LMS.Entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -15,8 +17,11 @@ public class Book_Loan implements Serializable {
     private Book book;
     private Library branch;
     private Borrower borrower;
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="EST")
     private Date dateOut;
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="EST")
     private Date dueDate;
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="EST")
     private Date dateIn;
 
     public Library getBranch() {
